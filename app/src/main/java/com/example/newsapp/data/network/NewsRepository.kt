@@ -1,5 +1,6 @@
 package com.example.newsapp.data.network
 
+import com.example.newsapp.model.NewsArticle
 import javax.inject.Inject
 
 class NewsRepository @Inject constructor(
