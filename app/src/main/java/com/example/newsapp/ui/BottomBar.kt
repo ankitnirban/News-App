@@ -27,39 +27,26 @@ fun BottomBar(
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     BottomAppBar {
-        BottomBarItem(
-            iconResId = R.drawable.ic_launcher_background,
-            text = "Breaking",
-            tabSelected = currentBackStackEntry?.destination?.route == Destination.BreakingNews::class.qualifiedName,
-            contentDescription = null,
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    navigateToDestination(navController, Destination.BreakingNews)
-                }
-        )
-        BottomBarItem(
-            iconResId = R.drawable.ic_launcher_background,
-            text = "Saved",
-            tabSelected = currentBackStackEntry?.destination?.route == Destination.SavedNews::class.qualifiedName,
-            contentDescription = null,
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    navigateToDestination(navController, Destination.SavedNews)
-                }
-        )
-        BottomBarItem(
-            iconResId = R.drawable.ic_launcher_background,
-            text = "Search",
-            tabSelected = currentBackStackEntry?.destination?.route == Destination.SearchNews::class.qualifiedName,
-            contentDescription = null,
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    navigateToDestination(navController, Destination.SearchNews)
-                }
-        )
+        Destination::class.sealedSubclasses.forEach { it ->
+            val route = it.qualifiedName
+            it.objectInstance?.let { destination ->
+                BottomBarItem(
+                    iconResId = R.drawable.ic_launcher_background,
+                    text = when(destination) {
+                        is Destination.BreakingNews -> "Breaking"
+                        is Destination.SavedNews -> "Saved"
+                        is Destination.SearchNews -> "Search"
+                    },
+                    tabSelected = currentBackStackEntry?.destination?.route == route,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            navigateToDestination(navController, destination)
+                        }
+                )
+            }
+        }
     }
 }
 
