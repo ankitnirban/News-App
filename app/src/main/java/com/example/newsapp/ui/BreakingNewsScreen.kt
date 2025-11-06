@@ -11,7 +11,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun BreakingNewsScreen(
     newsViewModel: NewsViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    navigateToNewsDetailsScreen: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val breakingNewsArticles = newsViewModel.breakingNewsArticles.collectAsStateWithLifecycle()
 
@@ -21,7 +22,10 @@ fun BreakingNewsScreen(
 
     LazyColumn(modifier = modifier) {
         items(breakingNewsArticles.value) { article ->
-            NewsArticleItem(article = article)
+            NewsArticleItem(
+                article = article,
+                navigateToNewsDetailsScreen = navigateToNewsDetailsScreen,
+            )
         }
     }
 }

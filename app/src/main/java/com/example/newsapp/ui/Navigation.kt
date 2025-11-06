@@ -12,6 +12,11 @@ sealed class Destination {
 
     @Serializable
     data object SearchNews : Destination()
+
+    @Serializable
+    data class NewsDetails(
+        val webUrl: String
+    ) : Destination()
 }
 
 fun navigateToDestination(navController: NavHostController, destination: Destination) {

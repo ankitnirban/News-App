@@ -10,42 +10,38 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.NavBackStackEntry
 import com.example.newsapp.R
 import androidx.navigation.NavHostController
 
 @Composable
 fun BottomBar(
+    currentBackStackEntry: NavBackStackEntry?,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val listOfTabs = listOf(Destination.BreakingNews, Destination.SavedNews, Destination.SearchNews)
     BottomAppBar {
-        Destination::class.sealedSubclasses.forEach { it ->
-            val route = it.qualifiedName
-            it.objectInstance?.let { destination ->
-                BottomBarItem(
-                    iconResId = R.drawable.ic_launcher_background,
-                    text = when(destination) {
-                        is Destination.BreakingNews -> "Breaking"
-                        is Destination.SavedNews -> "Saved"
-                        is Destination.SearchNews -> "Search"
-                    },
-                    tabSelected = currentBackStackEntry?.destination?.route == route,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable {
-                            navigateToDestination(navController, destination)
-                        }
-                )
-            }
+        listOfTabs.forEach { destination ->
+            BottomBarItem(
+                iconResId = R.drawable.ic_launcher_background,
+                text = when(destination) {
+                    Destination.BreakingNews -> "Breaking"
+                    Destination.SavedNews -> "Saved"
+                    Destination.SearchNews -> "Search"
+                    else -> ""
+                },
+                tabSelected = currentBackStackEntry?.destination?.route == destination::class.qualifiedName,
+                contentDescription = null,
+                modifier = Modifier.weight(1f).clickable {
+                    navigateToDestination(navController, destination)
+                }
+            )
         }
     }
 }
