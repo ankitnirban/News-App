@@ -1,4 +1,4 @@
-package com.example.newsapp.ui
+package com.example.newsapp.ui.screen
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -14,6 +14,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.newsapp.ui.component.BottomBar
+import com.example.newsapp.ui.Destination
+import com.example.newsapp.ui.NewsViewModel
+import com.example.newsapp.ui.navigateToDestination
 
 @Composable
 fun NewsMainScreen(

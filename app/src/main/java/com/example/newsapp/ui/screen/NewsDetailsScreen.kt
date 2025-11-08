@@ -1,4 +1,4 @@
-package com.example.newsapp.ui
+package com.example.newsapp.ui.screen
 
 import android.annotation.SuppressLint
 import android.webkit.WebView

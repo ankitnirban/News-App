@@ -3,8 +3,8 @@ package com.example.newsapp.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newsapp.data.network.NewsArticle
 import com.example.newsapp.data.network.NewsRepository
-import com.example.newsapp.model.NewsArticle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

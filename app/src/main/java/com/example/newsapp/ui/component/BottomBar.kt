@@ -1,4 +1,4 @@
-package com.example.newsapp.ui
+package com.example.newsapp.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import com.example.newsapp.R
 import androidx.navigation.NavHostController
+import com.example.newsapp.ui.Destination
+import com.example.newsapp.ui.navigateToDestination
 
 @Composable
 fun BottomBar(
