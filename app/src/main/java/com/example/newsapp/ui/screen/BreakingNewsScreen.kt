@@ -16,10 +16,13 @@ fun BreakingNewsScreen(
     navigateToNewsDetailsScreen: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Collect StateFlow - automatically updates when database changes (offline-first)
     val breakingNewsArticles = newsViewModel.breakingNewsArticles.collectAsStateWithLifecycle()
 
+    // Refresh from network on initial load (runs in background)
+    // Cached data is shown immediately, then updates when network data arrives
     LaunchedEffect(Unit) {
-        newsViewModel.getBreakingNews()
+        newsViewModel.refreshBreakingNews()
     }
 
     LazyColumn(modifier = modifier) {
@@ -27,6 +30,8 @@ fun BreakingNewsScreen(
             NewsArticleItem(
                 article = article,
                 navigateToNewsDetailsScreen = navigateToNewsDetailsScreen,
+                saveNewsArticle = { title -> newsViewModel.saveNewsArticle(title) },
+                unsaveNewsArticle = { title -> newsViewModel.unsaveNewsArticle(title) }
             )
         }
     }

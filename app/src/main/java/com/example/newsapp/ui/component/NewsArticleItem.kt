@@ -21,10 +21,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,19 +33,11 @@ import com.example.newsapp.data.network.NewsArticle
 @Composable
 fun NewsArticleItem(
     article: NewsArticle,
-    onSaveClick: () -> Unit = {},
+    saveNewsArticle: (String) -> Unit = {},
+    unsaveNewsArticle: (String) -> Unit = {},
     navigateToNewsDetailsScreen: (String) -> Unit,
-    isSaved: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    // Local state to track saved status - initialized with isSaved parameter
-    var savedState by remember(article.url) { mutableStateOf(isSaved) }
-    
-    // Handler for save button click
-    val handleSaveClick = {
-        savedState = !savedState
-        onSaveClick()
-    }
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -98,15 +86,21 @@ fun NewsArticleItem(
                             }
                         )
                         IconButton(
-                            onClick = handleSaveClick,
+                            onClick = {
+                                if (article.saved) {
+                                    unsaveNewsArticle(article.title)
+                                } else {
+                                    saveNewsArticle(article.title)
+                                }
+                            },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(8.dp)
                         ) {
                             Icon(
-                                imageVector = if (savedState) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                                contentDescription = if (savedState) "Remove from saved" else "Save article",
-                                tint = if (savedState) {
+                                imageVector = if (article.saved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                                contentDescription = if (article.saved) "Remove from saved" else "Save article",
+                                tint = if (article.saved) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
                                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
@@ -158,15 +152,21 @@ fun NewsArticleItem(
             // Save button in top-right corner (when no image or overlaying image)
             if (article.urlToImage == null) {
                 IconButton(
-                    onClick = handleSaveClick,
+                    onClick = {
+                        if (article.saved) {
+                            unsaveNewsArticle(article.title)
+                        } else {
+                            saveNewsArticle(article.title)
+                        }
+                    },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
                 ) {
                     Icon(
-                        imageVector = if (savedState) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                        contentDescription = if (savedState) "Remove from saved" else "Save article",
-                        tint = if (savedState) {
+                        imageVector = if (article.saved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                        contentDescription = if (article.saved) "Remove from saved" else "Save article",
+                        tint = if (article.saved) {
                             MaterialTheme.colorScheme.primary
                         } else {
                             MaterialTheme.colorScheme.onSurface

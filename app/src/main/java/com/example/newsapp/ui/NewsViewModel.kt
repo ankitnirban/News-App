@@ -6,10 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.newsapp.data.network.NewsArticle
 import com.example.newsapp.data.network.NewsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,12 +17,39 @@ class NewsViewModel @Inject constructor(
     private val newsRepository: NewsRepository
 ): ViewModel() {
 
-    private val _breakingNewsArticles: MutableStateFlow<List<NewsArticle>> = MutableStateFlow(emptyList())
-    val breakingNewsArticles: StateFlow<List<NewsArticle>> = _breakingNewsArticles.asStateFlow()
+    /**
+     * Observes breaking news articles from the database.
+     * Automatically updates when database changes (offline-first approach).
+     */
+    val breakingNewsArticles: StateFlow<List<NewsArticle>> = newsRepository.getBreakingNews()
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    fun getBreakingNews() {
+    val savedNewsArticles: StateFlow<List<NewsArticle>> = newsRepository.getSavedNewsArticles()
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    /**
+     * Refreshes breaking news from network in the background.
+     * Database Flow will automatically update UI when new data arrives.
+     */
+    fun refreshBreakingNews() {
         viewModelScope.launch {
-            _breakingNewsArticles.update { newsRepository.getBreakingNews() }
+            newsRepository.refreshBreakingNews()
         }
+    }
+
+    fun saveNewsArticle(title: String) {
+        viewModelScope.launch { newsRepository.saveNewsArticle(title) }
+    }
+
+    fun unsaveNewsArticle(title: String) {
+        viewModelScope.launch { newsRepository.unsaveNewsArticle(title) }
     }
 }

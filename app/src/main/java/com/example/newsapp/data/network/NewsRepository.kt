@@ -4,19 +4,83 @@ import android.util.Log
 import com.example.newsapp.data.local.NewsArticleDao
 import com.example.newsapp.data.local.model.NewsArticleEntity
 import com.example.newsapp.data.local.model.NewsSourceEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class NewsRepository @Inject constructor(
     val newsApi: NewsApi,
     val newsArticleDao: NewsArticleDao
 ) {
-    suspend fun getBreakingNews(): List<NewsArticle> {
-        val newsArticlesFromDb = getBreakingNewsFromDb()
-        val newsArticlesFromNetwork = getBreakingNewsFromNetwork()
-        if (newsArticlesFromNetwork.isNotEmpty() && !areArticlesEqual(newsArticlesFromNetwork, newsArticlesFromDb)) {
-            saveBreakingNewsToDb(newsArticlesFromNetwork)
+    /**
+     * Returns a Flow that observes the database for breaking news articles.
+     * This provides offline-first behavior - UI immediately shows cached data.
+     */
+
+    suspend fun saveNewsArticle(title: String) {
+        newsArticleDao.saveNewsArticle(title)
+    }
+
+    suspend fun unsaveNewsArticle(title: String) {
+        newsArticleDao.unsaveNewsArticle(title)
+    }
+
+    fun getBreakingNews(): Flow<List<NewsArticle>> {
+        return newsArticleDao.getAllArticles().map { entities ->
+            entities.map { entity ->
+                NewsArticle(
+                    title = entity.title,
+                    description = entity.description,
+                    url = entity.url,
+                    urlToImage = entity.urlToImage,
+                    content = entity.content,
+                    source = NewsSource(
+                        id = entity.source?.id,
+                        name = entity.source?.name
+                    ),
+                    saved = entity.saved
+                )
+            }
         }
-        return getBreakingNewsFromDb()
+    }
+
+    fun getSavedNewsArticles(): Flow<List<NewsArticle>> {
+        return newsArticleDao.getSavedArticles().map { entities ->
+            entities.map { entity ->
+                NewsArticle(
+                    title = entity.title,
+                    description = entity.description,
+                    url = entity.url,
+                    urlToImage = entity.urlToImage,
+                    content = entity.content,
+                    source = NewsSource(
+                        id = entity.source?.id,
+                        name = entity.source?.name
+                    ),
+                    saved = entity.saved
+                )
+            }
+        }
+    }
+
+    /**
+     * Refreshes breaking news from network and updates the database.
+     * Should be called in the background - database Flow will automatically update UI.
+     */
+    suspend fun refreshBreakingNews() {
+        try {
+            val newsArticlesFromNetwork = getBreakingNewsFromNetwork()
+            if (newsArticlesFromNetwork.isNotEmpty()) {
+                val newsArticlesFromDb = getBreakingNewsFromDbOnce()
+                if (!areArticlesEqual(newsArticlesFromNetwork, newsArticlesFromDb)) {
+                    saveBreakingNewsToDb(newsArticlesFromNetwork)
+                    Log.d("NewsRepository", "Breaking news refreshed from network")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("NewsRepository", "Error refreshing breaking news", e)
+            // Fail silently - offline data will still be shown
+        }
     }
 
     private fun areArticlesEqual(networkArticles: List<NewsArticle>, dbArticles: List<NewsArticle>): Boolean {
@@ -49,12 +113,11 @@ class NewsRepository @Inject constructor(
                 article1.source?.name == article2.source?.name
     }
 
-    suspend fun getBreakingNewsFromNetwork(): List<NewsArticle> {
+    private suspend fun getBreakingNewsFromNetwork(): List<NewsArticle> {
         val newsArticleResponse = newsApi.getBreakingNews()
         return if (newsArticleResponse.isSuccessful) {
             newsArticleResponse.body()?.articles?.map {
                 NewsArticle(
-                    id = null,
                     title = it.title,
                     description = it.description,
                     url = it.url,
@@ -71,25 +134,28 @@ class NewsRepository @Inject constructor(
         }
     }
 
-    suspend fun getBreakingNewsFromDb(): List<NewsArticle> {
-        val newsArticleEntities = newsArticleDao.getAllArticles()
+    private suspend fun getBreakingNewsFromDbOnce(): List<NewsArticle> {
+        val newsArticleEntities = newsArticleDao.getAllArticlesOnce()
         return newsArticleEntities.map {
             NewsArticle(
-                id = it.id,
                 title = it.title,
                 description = it.description,
                 url = it.url,
                 urlToImage = it.urlToImage,
                 content = it.content,
                 source = NewsSource(
-                    id = it.source?.sourceId,
-                    name = it.source?.sourceName
-                )
+                    id = it.source?.id,
+                    name = it.source?.name
+                ),
+                saved = it.saved
             )
         }
     }
 
-    suspend fun saveBreakingNewsToDb(newsArticles: List<NewsArticle>) {
+    private suspend fun saveBreakingNewsToDb(newsArticles: List<NewsArticle>) {
+        // Clear existing articles before inserting new ones to prevent duplicates
+        // Breaking news is a fresh list that replaces the previous one
+        
         val newsArticleEntities = newsArticles.map {
             NewsArticleEntity(
                 title = it.title,
@@ -98,8 +164,8 @@ class NewsRepository @Inject constructor(
                 urlToImage = it.urlToImage,
                 content = it.content,
                 source = NewsSourceEntity(
-                    sourceId = it.source?.id,
-                    sourceName = it.source?.name
+                    id = it.source?.id,
+                    name = it.source?.name
                 )
             )
         }
@@ -109,13 +175,13 @@ class NewsRepository @Inject constructor(
 }
 
 data class NewsArticle(
-    val id: Long?,
     val title: String,
     val description: String?,
     val url: String?,
     val urlToImage: String?,
     val content: String?,
-    val source: NewsSource?
+    val source: NewsSource?,
+    val saved: Boolean = false
 )
 
 data class NewsSource(
