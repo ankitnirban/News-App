@@ -6,9 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.newsapp.data.network.NewsArticle
 import com.example.newsapp.data.network.NewsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,10 +38,9 @@ class NewsViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    /**
-     * Refreshes breaking news from network in the background.
-     * Database Flow will automatically update UI when new data arrives.
-     */
+    private val _searchResults: MutableStateFlow<List<NewsArticle>> = MutableStateFlow(emptyList())
+    val searchResults = _searchResults.asStateFlow()
+
     fun refreshBreakingNews() {
         viewModelScope.launch {
             newsRepository.refreshBreakingNews()
@@ -51,5 +53,11 @@ class NewsViewModel @Inject constructor(
 
     fun unsaveNewsArticle(title: String) {
         viewModelScope.launch { newsRepository.unsaveNewsArticle(title) }
+    }
+
+    fun searchNews(query: String) {
+        viewModelScope.launch {
+            _searchResults.update { newsRepository.searchNews(query) }
+        }
     }
 }

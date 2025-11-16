@@ -7,6 +7,7 @@ import com.example.newsapp.data.local.model.NewsSourceEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import kotlin.collections.map
 
 class NewsRepository @Inject constructor(
     val newsApi: NewsApi,
@@ -41,6 +42,27 @@ class NewsRepository @Inject constructor(
                     saved = entity.saved
                 )
             }
+        }
+    }
+
+    suspend fun searchNews(query: String): List<NewsArticle> {
+        val searchNewsResponse = newsApi.searchNews(query)
+        return if (searchNewsResponse.isSuccessful) {
+            searchNewsResponse.body()?.articles?.map {
+                NewsArticle(
+                    title = it.title,
+                    description = it.description,
+                    url = it.url,
+                    urlToImage = it.urlToImage,
+                    content = it.content,
+                    source = NewsSource(
+                        id = it.source?.id,
+                        name = it.source?.name
+                    )
+                )
+            } ?: emptyList()
+        } else {
+            emptyList()
         }
     }
 
