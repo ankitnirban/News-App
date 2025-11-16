@@ -19,46 +19,51 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class DataModule {
-
     @Provides
     @Singleton
     fun newsApi(): NewsApi {
         val loggingInterceptor =
             HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val originalRequest = chain.request()
-                val newRequest = originalRequest.newBuilder()
-                    .header("X-Api-Key", "d93f9f4d733749a78188b21d62a1b79d")
-                    .build()
-                chain.proceed(newRequest)
-            }
-            .addInterceptor(loggingInterceptor)
-            .build()
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://newsapi.org/v2/")
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        val okHttpClient =
+            OkHttpClient
+                .Builder()
+                .addInterceptor { chain ->
+                    val originalRequest = chain.request()
+                    val newRequest =
+                        originalRequest
+                            .newBuilder()
+                            .header("X-Api-Key", "d93f9f4d733749a78188b21d62a1b79d")
+                            .build()
+                    chain.proceed(newRequest)
+                }.addInterceptor(loggingInterceptor)
+                .build()
+        val retrofit =
+            Retrofit
+                .Builder()
+                .baseUrl("https://newsapi.org/v2/")
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
         return retrofit.create(NewsApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun newsDatabase(@ApplicationContext context: Context): NewsDatabase {
-        val database = Room
-            .databaseBuilder(
-                context,
-                NewsDatabase::class.java,
-                "news_database"
-            )
-            .fallbackToDestructiveMigration()
-            .build()
+    fun newsDatabase(
+        @ApplicationContext context: Context,
+    ): NewsDatabase {
+        val database =
+            Room
+                .databaseBuilder(
+                    context,
+                    NewsDatabase::class.java,
+                    "news_database",
+                ).fallbackToDestructiveMigration()
+                .build()
         return database
     }
 
     @Provides
-    fun newsArticleDao(newsDatabase: NewsDatabase): NewsArticleDao {
-        return newsDatabase.newsArticleDao()
-    }
+    @Singleton
+    fun newsArticleDao(newsDatabase: NewsDatabase): NewsArticleDao = newsDatabase.newsArticleDao()
 }

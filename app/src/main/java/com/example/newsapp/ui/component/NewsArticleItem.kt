@@ -36,19 +36,20 @@ fun NewsArticleItem(
     saveNewsArticle: (String) -> Unit = {},
     unsaveNewsArticle: (String) -> Unit = {},
     navigateToNewsDetailsScreen: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable(enabled = article.url != null) {
-                article.url?.let { webUrl ->
-                    navigateToNewsDetailsScreen(webUrl)
-                }
-            },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .clickable(enabled = article.url != null) {
+                    article.url?.let { webUrl ->
+                        navigateToNewsDetailsScreen(webUrl)
+                    }
+                },
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -58,15 +59,16 @@ fun NewsArticleItem(
                         SubcomposeAsyncImage(
                             model = imageUrl,
                             contentDescription = article.title,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
                             contentScale = ContentScale.Crop,
                             loading = {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     CircularProgressIndicator()
                                 }
@@ -74,16 +76,16 @@ fun NewsArticleItem(
                             error = {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.BrokenImage,
                                         contentDescription = "Image failed to load",
                                         modifier = Modifier.size(48.dp),
-                                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                     )
                                 }
-                            }
+                            },
                         )
                         IconButton(
                             onClick = {
@@ -93,28 +95,31 @@ fun NewsArticleItem(
                                     saveNewsArticle(article.title)
                                 }
                             },
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(8.dp)
+                            modifier =
+                                Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(8.dp),
                         ) {
                             Icon(
                                 imageVector = if (article.saved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                                 contentDescription = if (article.saved) "Remove from saved" else "Save article",
-                                tint = if (article.saved) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-                                },
-                                modifier = Modifier.size(24.dp)
+                                tint =
+                                    if (article.saved) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                                    },
+                                modifier = Modifier.size(24.dp),
                             )
                         }
                     }
                 }
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                 ) {
                     // Source name
                     article.source?.name?.let { sourceName ->
@@ -122,7 +127,7 @@ fun NewsArticleItem(
                             text = sourceName,
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(bottom = 4.dp)
+                            modifier = Modifier.padding(bottom = 4.dp),
                         )
                     }
 
@@ -133,7 +138,7 @@ fun NewsArticleItem(
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp),
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
 
                     // Article description
@@ -143,12 +148,12 @@ fun NewsArticleItem(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 3,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
             }
-            
+
             // Save button in top-right corner (when no image or overlaying image)
             if (article.urlToImage == null) {
                 IconButton(
@@ -159,19 +164,21 @@ fun NewsArticleItem(
                             saveNewsArticle(article.title)
                         }
                     },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp),
                 ) {
                     Icon(
                         imageVector = if (article.saved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                         contentDescription = if (article.saved) "Remove from saved" else "Save article",
-                        tint = if (article.saved) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onSurface
-                        },
-                        modifier = Modifier.size(24.dp)
+                        tint =
+                            if (article.saved) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }

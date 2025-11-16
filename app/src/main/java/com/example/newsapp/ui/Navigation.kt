@@ -15,11 +15,14 @@ sealed class Destination {
 
     @Serializable
     data class NewsDetails(
-        val webUrl: String
+        val webUrl: String,
     ) : Destination()
 }
 
-fun navigateToDestination(navController: NavHostController, destination: Destination) {
+fun navigateToDestination(
+    navController: NavHostController,
+    destination: Destination,
+) {
     navController.navigate(destination) {
         popUpTo<Destination.BreakingNews> {
             inclusive = false

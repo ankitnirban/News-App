@@ -16,8 +16,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
-import com.example.newsapp.R
 import androidx.navigation.NavHostController
+import com.example.newsapp.R
 import com.example.newsapp.ui.Destination
 import com.example.newsapp.ui.navigateToDestination
 
@@ -25,24 +25,26 @@ import com.example.newsapp.ui.navigateToDestination
 fun BottomBar(
     currentBackStackEntry: NavBackStackEntry?,
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val listOfTabs = listOf(Destination.BreakingNews, Destination.SavedNews, Destination.SearchNews)
     BottomAppBar {
         listOfTabs.forEach { destination ->
             BottomBarItem(
                 iconResId = R.drawable.ic_launcher_background,
-                text = when(destination) {
-                    Destination.BreakingNews -> "Breaking"
-                    Destination.SavedNews -> "Saved"
-                    Destination.SearchNews -> "Search"
-                    else -> ""
-                },
+                text =
+                    when (destination) {
+                        Destination.BreakingNews -> "Breaking"
+                        Destination.SavedNews -> "Saved"
+                        Destination.SearchNews -> "Search"
+                        else -> ""
+                    },
                 tabSelected = currentBackStackEntry?.destination?.route == destination::class.qualifiedName,
                 contentDescription = null,
-                modifier = Modifier.weight(1f).clickable {
-                    navigateToDestination(navController, destination)
-                }
+                modifier =
+                    Modifier.weight(1f).clickable {
+                        navigateToDestination(navController, destination)
+                    },
             )
         }
     }
@@ -54,17 +56,17 @@ fun BottomBarItem(
     text: String,
     tabSelected: Boolean,
     contentDescription: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Image(
             modifier = Modifier.size(24.dp),
             painter = painterResource(id = iconResId),
-            contentDescription = contentDescription
+            contentDescription = contentDescription,
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = text, fontWeight = if (tabSelected) FontWeight.Bold else FontWeight.Normal)

@@ -11,7 +11,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 @Composable
 fun NewsDetailsScreen(
     webUrl: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AndroidView(
         factory = { context ->
@@ -25,6 +25,6 @@ fun NewsDetailsScreen(
         },
         update = { webView ->
             webView.loadUrl(webUrl)
-        }
+        },
     )
 }

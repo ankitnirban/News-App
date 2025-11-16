@@ -12,10 +12,10 @@ data class NewsArticleEntity(
     val urlToImage: String?,
     val content: String?,
     @Embedded val source: NewsSourceEntity?,
-    val saved: Boolean = false
+    val saved: Boolean = false,
 )
 
 data class NewsSourceEntity(
     val id: String?,
-    val name: String?
+    val name: String?,
 )

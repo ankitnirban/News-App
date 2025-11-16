@@ -1,7 +1,7 @@
 package com.example.newsapp.data.network.model
 
 data class NewsResponse(
-    val articles: List<NewsArticleResponse>
+    val articles: List<NewsArticleResponse>,
 )
 
 data class NewsArticleResponse(
@@ -10,10 +10,10 @@ data class NewsArticleResponse(
     val url: String?,
     val urlToImage: String?,
     val content: String?,
-    val source: NewsSourceResponse?
+    val source: NewsSourceResponse?,
 )
 
 data class NewsSourceResponse(
     val id: String,
-    val name: String?
+    val name: String?,
 )

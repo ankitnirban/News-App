@@ -32,5 +32,4 @@ interface NewsArticleDao {
 
     @Query("SELECT * FROM news_articles WHERE saved = 1")
     fun getSavedArticles(): Flow<List<NewsArticleEntity>>
-
 }

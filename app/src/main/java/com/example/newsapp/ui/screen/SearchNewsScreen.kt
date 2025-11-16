@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,14 +21,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.newsapp.ui.NewsViewModel
 import com.example.newsapp.ui.component.NewsArticleItem
 import com.example.newsapp.ui.component.SearchBar
-import com.example.newsapp.ui.navigateToDestination
 import kotlinx.coroutines.delay
 
 @Composable
 fun SearchNewsScreen(
     newsViewModel: NewsViewModel = hiltViewModel(),
     navigateToNewsDetailsScreen: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val searchResults = newsViewModel.searchResults.collectAsStateWithLifecycle()
@@ -42,11 +40,12 @@ fun SearchNewsScreen(
     }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(vertical = 8.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Top,
     ) {
         SearchBar(
             query = searchQuery,
@@ -59,7 +58,7 @@ fun SearchNewsScreen(
                     article = searchResults.value[index],
                     saveNewsArticle = { title -> newsViewModel.saveNewsArticle(title) },
                     unsaveNewsArticle = { title -> newsViewModel.unsaveNewsArticle(title) },
-                    navigateToNewsDetailsScreen = navigateToNewsDetailsScreen
+                    navigateToNewsDetailsScreen = navigateToNewsDetailsScreen,
                 )
             }
         }

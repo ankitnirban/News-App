@@ -1,6 +1,5 @@
 package com.example.newsapp.ui
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapp.data.network.NewsArticle
@@ -16,48 +15,53 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class NewsViewModel @Inject constructor(
-    private val newsRepository: NewsRepository
-): ViewModel() {
+class NewsViewModel
+    @Inject
+    constructor(
+        private val newsRepository: NewsRepository,
+    ) : ViewModel() {
+        /**
+         * Observes breaking news articles from the database.
+         * Automatically updates when database changes (offline-first approach).
+         */
+        val breakingNewsArticles: StateFlow<List<NewsArticle>> =
+            newsRepository
+                .getBreakingNews()
+                .stateIn(
+                    scope = viewModelScope,
+                    started = WhileSubscribed(5000),
+                    initialValue = emptyList(),
+                )
 
-    /**
-     * Observes breaking news articles from the database.
-     * Automatically updates when database changes (offline-first approach).
-     */
-    val breakingNewsArticles: StateFlow<List<NewsArticle>> = newsRepository.getBreakingNews()
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+        val savedNewsArticles: StateFlow<List<NewsArticle>> =
+            newsRepository
+                .getSavedNewsArticles()
+                .stateIn(
+                    scope = viewModelScope,
+                    started = WhileSubscribed(5000),
+                    initialValue = emptyList(),
+                )
 
-    val savedNewsArticles: StateFlow<List<NewsArticle>> = newsRepository.getSavedNewsArticles()
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+        private val _searchResults: MutableStateFlow<List<NewsArticle>> = MutableStateFlow(emptyList())
+        val searchResults = _searchResults.asStateFlow()
 
-    private val _searchResults: MutableStateFlow<List<NewsArticle>> = MutableStateFlow(emptyList())
-    val searchResults = _searchResults.asStateFlow()
+        fun refreshBreakingNews() {
+            viewModelScope.launch {
+                newsRepository.refreshBreakingNews()
+            }
+        }
 
-    fun refreshBreakingNews() {
-        viewModelScope.launch {
-            newsRepository.refreshBreakingNews()
+        fun saveNewsArticle(title: String) {
+            viewModelScope.launch { newsRepository.saveNewsArticle(title) }
+        }
+
+        fun unsaveNewsArticle(title: String) {
+            viewModelScope.launch { newsRepository.unsaveNewsArticle(title) }
+        }
+
+        fun searchNews(query: String) {
+            viewModelScope.launch {
+                _searchResults.update { newsRepository.searchNews(query) }
+            }
         }
     }
-
-    fun saveNewsArticle(title: String) {
-        viewModelScope.launch { newsRepository.saveNewsArticle(title) }
-    }
-
-    fun unsaveNewsArticle(title: String) {
-        viewModelScope.launch { newsRepository.unsaveNewsArticle(title) }
-    }
-
-    fun searchNews(query: String) {
-        viewModelScope.launch {
-            _searchResults.update { newsRepository.searchNews(query) }
-        }
-    }
-}

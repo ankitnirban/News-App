@@ -7,8 +7,8 @@ import com.example.newsapp.data.local.model.NewsArticleEntity
 @Database(
     entities = [NewsArticleEntity::class],
     version = 4,
-    exportSchema = false
+    exportSchema = false,
 )
-abstract class NewsDatabase: RoomDatabase() {
+abstract class NewsDatabase : RoomDatabase() {
     abstract fun newsArticleDao(): NewsArticleDao
 }

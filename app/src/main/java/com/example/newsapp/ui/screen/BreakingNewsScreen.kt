@@ -7,8 +7,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.newsapp.ui.component.NewsArticleItem
 import com.example.newsapp.ui.NewsViewModel
+import com.example.newsapp.ui.component.NewsArticleItem
 
 @Composable
 fun BreakingNewsScreen(
@@ -31,7 +31,7 @@ fun BreakingNewsScreen(
                 article = article,
                 navigateToNewsDetailsScreen = navigateToNewsDetailsScreen,
                 saveNewsArticle = { title -> newsViewModel.saveNewsArticle(title) },
-                unsaveNewsArticle = { title -> newsViewModel.unsaveNewsArticle(title) }
+                unsaveNewsArticle = { title -> newsViewModel.unsaveNewsArticle(title) },
             )
         }
     }

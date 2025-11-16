@@ -14,15 +14,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.newsapp.ui.component.BottomBar
 import com.example.newsapp.ui.Destination
 import com.example.newsapp.ui.NewsViewModel
+import com.example.newsapp.ui.component.BottomBar
 import com.example.newsapp.ui.navigateToDestination
 
 @Composable
 fun NewsMainScreen(
     newsViewModel: NewsViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -31,15 +31,15 @@ fun NewsMainScreen(
             BottomBar(
                 currentBackStackEntry = currentBackStackEntry,
                 navController = navController,
-                modifier = Modifier.height(200.dp)
+                modifier = Modifier.height(200.dp),
             )
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = Destination.BreakingNews,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         ) {
             composable<Destination.BreakingNews> {
                 BreakingNewsScreen(
@@ -47,10 +47,10 @@ fun NewsMainScreen(
                     navigateToNewsDetailsScreen = { webUrl ->
                         navigateToDestination(
                             navController,
-                            Destination.NewsDetails(webUrl)
+                            Destination.NewsDetails(webUrl),
                         )
                     },
-                    modifier = modifier
+                    modifier = modifier,
                 )
             }
             composable<Destination.SavedNews> {
@@ -59,24 +59,24 @@ fun NewsMainScreen(
                     navigateToNewsDetailsScreen = { webUrl ->
                         navigateToDestination(
                             navController,
-                            Destination.NewsDetails(webUrl)
+                            Destination.NewsDetails(webUrl),
                         )
                     },
-                    modifier = modifier
+                    modifier = modifier,
                 )
             }
             composable<Destination.SearchNews> {
                 SearchNewsScreen(
                     newsViewModel = newsViewModel,
                     navigateToNewsDetailsScreen = { webUrl -> navigateToDestination(navController, Destination.NewsDetails(webUrl)) },
-                    modifier = modifier
+                    modifier = modifier,
                 )
             }
             composable<Destination.NewsDetails> { backStackEntry ->
                 val route: Destination.NewsDetails = backStackEntry.toRoute()
                 NewsDetailsScreen(
                     webUrl = route.webUrl,
-                    modifier = modifier
+                    modifier = modifier,
                 )
             }
         }
