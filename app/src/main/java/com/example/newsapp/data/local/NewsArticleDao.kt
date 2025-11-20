@@ -12,9 +12,6 @@ interface NewsArticleDao {
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertArticles(articles: List<NewsArticleEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    suspend fun insertArticle(article: NewsArticleEntity)
-
     @Query("UPDATE news_articles SET saved = 1 WHERE url = :url")
     suspend fun saveNewsArticle(url: String)
 
@@ -24,12 +21,6 @@ interface NewsArticleDao {
     @Query("SELECT * FROM news_articles ORDER BY url DESC")
     fun getAllArticles(): Flow<List<NewsArticleEntity>>
 
-    @Query("SELECT * FROM news_articles ORDER BY url DESC")
-    suspend fun getAllArticlesOnce(): List<NewsArticleEntity>
-
-    @Query("DELETE FROM news_articles")
-    suspend fun clearAllArticles()
-
     @Query("SELECT * FROM news_articles WHERE saved = 1")
     fun getSavedArticles(): Flow<List<NewsArticleEntity>>
 
@@ -37,5 +28,5 @@ interface NewsArticleDao {
     suspend fun getSavedArticleUrlsOnce(): List<String>
 
     @Query("DELETE FROM news_articles WHERE saved = 0")
-    fun clearUnsavedArticles()
+    suspend fun clearUnsavedArticles()
 }
