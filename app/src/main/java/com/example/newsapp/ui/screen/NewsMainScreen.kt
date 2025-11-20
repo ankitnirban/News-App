@@ -68,7 +68,12 @@ fun NewsMainScreen(
             composable<Destination.SearchNews> {
                 SearchNewsScreen(
                     newsViewModel = newsViewModel,
-                    navigateToNewsDetailsScreen = { webUrl -> navigateToDestination(navController, Destination.NewsDetails(webUrl)) },
+                    navigateToNewsDetailsScreen = { webUrl ->
+                        navigateToDestination(
+                            navController,
+                            Destination.NewsDetails(webUrl),
+                        )
+                    },
                     modifier = modifier,
                 )
             }

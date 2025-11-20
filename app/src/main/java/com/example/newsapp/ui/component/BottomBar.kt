@@ -32,14 +32,8 @@ fun BottomBar(
         listOfTabs.forEach { destination ->
             BottomBarItem(
                 iconResId = R.drawable.ic_launcher_background,
-                text =
-                    when (destination) {
-                        Destination.BreakingNews -> "Breaking"
-                        Destination.SavedNews -> "Saved"
-                        Destination.SearchNews -> "Search"
-                        else -> ""
-                    },
-                tabSelected = currentBackStackEntry?.destination?.route == destination::class.qualifiedName,
+                text = getTabText(destination),
+                tabSelected = isTabSelected(currentBackStackEntry, destination),
                 contentDescription = null,
                 modifier =
                     Modifier.weight(1f).clickable {
@@ -48,6 +42,22 @@ fun BottomBar(
             )
         }
     }
+}
+
+private fun getTabText(destination: Destination): String {
+    return when (destination) {
+        Destination.BreakingNews -> "Breaking"
+        Destination.SavedNews -> "Saved"
+        Destination.SearchNews -> "Search"
+        else -> ""
+    }
+}
+
+private fun isTabSelected(
+    currentBackStackEntry: NavBackStackEntry?,
+    destination: Destination,
+): Boolean {
+    return currentBackStackEntry?.destination?.route == destination::class.qualifiedName
 }
 
 @Composable

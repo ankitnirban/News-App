@@ -1,15 +1,17 @@
 package com.example.newsapp.data.network
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.newsapp.data.local.NewsArticleDao
 import com.example.newsapp.data.local.model.NewsArticleEntity
 import com.example.newsapp.data.local.model.NewsSourceEntity
+import com.example.newsapp.data.network.model.NewsArticleResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.util.Date
 import javax.inject.Inject
-import kotlin.collections.map
 
 class NewsRepository
     @Inject
@@ -18,6 +20,7 @@ class NewsRepository
         val newsArticleDao: NewsArticleDao,
     ) {
 
+        @RequiresApi(Build.VERSION_CODES.O)
         suspend fun saveNewsArticle(url: String) {
             newsArticleDao.saveNewsArticle(url, Date.from(Instant.now()))
         }
@@ -28,39 +31,14 @@ class NewsRepository
 
         fun getBreakingNews(): Flow<List<NewsArticle>> =
             newsArticleDao.getAllArticles().map { entities ->
-                entities.map { entity ->
-                    NewsArticle(
-                        title = entity.title,
-                        description = entity.description,
-                        url = entity.url,
-                        urlToImage = entity.urlToImage,
-                        content = entity.content,
-                        source =
-                            NewsSource(
-                                id = entity.source?.id,
-                                name = entity.source?.name,
-                            ),
-                        saved = entity.saved,
-                    )
-                }
+                entities.map { entity -> mapEntityToNewsArticle(entity) }
             }
 
         suspend fun searchNews(query: String): List<NewsArticle> {
             val searchNewsResponse = newsApi.searchNews(query)
             return if (searchNewsResponse.isSuccessful) {
-                searchNewsResponse.body()?.articles?.map {
-                    NewsArticle(
-                        title = it.title,
-                        description = it.description,
-                        url = it.url,
-                        urlToImage = it.urlToImage,
-                        content = it.content,
-                        source =
-                            NewsSource(
-                                id = it.source?.id,
-                                name = it.source?.name,
-                            ),
-                    )
+                searchNewsResponse.body()?.articles?.map { response ->
+                    mapResponseToNewsArticle(response)
                 } ?: emptyList()
             } else {
                 emptyList()
@@ -69,21 +47,7 @@ class NewsRepository
 
         fun getSavedNewsArticles(): Flow<List<NewsArticle>> =
             newsArticleDao.getSavedArticles().map { entities ->
-                entities.map { entity ->
-                    NewsArticle(
-                        title = entity.title,
-                        description = entity.description,
-                        url = entity.url,
-                        urlToImage = entity.urlToImage,
-                        content = entity.content,
-                        source =
-                            NewsSource(
-                                id = entity.source?.id,
-                                name = entity.source?.name,
-                            ),
-                        saved = entity.saved,
-                    )
-                }
+                entities.map { entity -> mapEntityToNewsArticle(entity) }
             }
 
         suspend fun refreshBreakingNews() {
@@ -91,24 +55,8 @@ class NewsRepository
                 val newsArticlesFromNetwork = getBreakingNewsFromNetwork()
                 if (newsArticlesFromNetwork.isNotEmpty()) {
                     val savedArticleUrls = newsArticleDao.getSavedArticleUrlsOnce()
-                    val newsArticleEntities = newsArticlesFromNetwork.map { articleDto ->
-                        val isArticleSaved = savedArticleUrls.contains(articleDto.url)
-                        val savedAt = if (!isArticleSaved) null else newsArticleDao.getArticleByUrl(articleDto.url)!!.savedAt
-                        NewsArticleEntity(
-                            title = articleDto.title,
-                            description = articleDto.description,
-                            url = articleDto.url,
-                            urlToImage = articleDto.urlToImage,
-                            content = articleDto.content,
-                            source = articleDto.source?.let {
-                                NewsSourceEntity(
-                                    id = it.id,
-                                    name = it.name
-                                )
-                            },
-                            saved = isArticleSaved,
-                            savedAt = savedAt
-                        )
+                    val newsArticleEntities = newsArticlesFromNetwork.map { article ->
+                        mapNewsArticleToEntity(article, savedArticleUrls)
                     }
                     newsArticleDao.clearUnsavedArticles()
                     newsArticleDao.insertArticles(newsArticleEntities)
@@ -121,23 +69,72 @@ class NewsRepository
         private suspend fun getBreakingNewsFromNetwork(): List<NewsArticle> {
             val newsArticleResponse = newsApi.getBreakingNews()
             return if (newsArticleResponse.isSuccessful) {
-                newsArticleResponse.body()?.articles?.map {
-                    NewsArticle(
-                        title = it.title,
-                        description = it.description,
-                        url = it.url,
-                        urlToImage = it.urlToImage,
-                        content = it.content,
-                        source =
-                            NewsSource(
-                                id = it.source?.id,
-                                name = it.source?.name,
-                            ),
-                    )
+                newsArticleResponse.body()?.articles?.map { response ->
+                    mapResponseToNewsArticle(response)
                 } ?: emptyList()
             } else {
                 emptyList()
             }
+        }
+
+        private suspend fun mapNewsArticleToEntity(
+            article: NewsArticle,
+            savedArticleUrls: List<String>,
+        ): NewsArticleEntity {
+            val isArticleSaved = savedArticleUrls.contains(article.url)
+            val savedAt =
+                if (!isArticleSaved) {
+                    null
+                } else {
+                    newsArticleDao.getArticleByUrl(article.url)!!.savedAt
+                }
+            return NewsArticleEntity(
+                title = article.title,
+                description = article.description,
+                url = article.url,
+                urlToImage = article.urlToImage,
+                content = article.content,
+                source =
+                    article.source?.let {
+                        NewsSourceEntity(
+                            id = it.id,
+                            name = it.name,
+                        )
+                    },
+                saved = isArticleSaved,
+                savedAt = savedAt,
+            )
+        }
+
+        private fun mapEntityToNewsArticle(entity: NewsArticleEntity): NewsArticle {
+            return NewsArticle(
+                title = entity.title,
+                description = entity.description,
+                url = entity.url,
+                urlToImage = entity.urlToImage,
+                content = entity.content,
+                source =
+                    NewsSource(
+                        id = entity.source?.id,
+                        name = entity.source?.name,
+                    ),
+                saved = entity.saved,
+            )
+        }
+
+        private fun mapResponseToNewsArticle(response: NewsArticleResponse): NewsArticle {
+            return NewsArticle(
+                title = response.title,
+                description = response.description,
+                url = response.url,
+                urlToImage = response.urlToImage,
+                content = response.content,
+                source =
+                    NewsSource(
+                        id = response.source?.id,
+                        name = response.source?.name,
+                    ),
+            )
         }
     }
 

@@ -20,6 +20,10 @@ class NewsViewModel
     constructor(
         private val newsRepository: NewsRepository,
     ) : ViewModel() {
+        companion object {
+            private const val STOP_TIMEOUT_MS = 5000L
+        }
+
         /**
          * Observes breaking news articles from the database.
          * Automatically updates when database changes (offline-first approach).
@@ -29,7 +33,7 @@ class NewsViewModel
                 .getBreakingNews()
                 .stateIn(
                     scope = viewModelScope,
-                    started = WhileSubscribed(5000),
+                    started = WhileSubscribed(STOP_TIMEOUT_MS),
                     initialValue = emptyList(),
                 )
 
@@ -38,7 +42,7 @@ class NewsViewModel
                 .getSavedNewsArticles()
                 .stateIn(
                     scope = viewModelScope,
-                    started = WhileSubscribed(5000),
+                    started = WhileSubscribed(STOP_TIMEOUT_MS),
                     initialValue = emptyList(),
                 )
 

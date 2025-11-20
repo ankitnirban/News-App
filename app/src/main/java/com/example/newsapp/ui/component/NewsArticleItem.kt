@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -85,8 +86,9 @@ fun NewsArticleItem(
                                 }
                             },
                         )
-                        IconButton(
-                            onClick = {
+                        BookmarkButton(
+                            isSaved = article.saved,
+                            onBookmarkClick = {
                                 if (article.saved) {
                                     unsaveNewsArticle(article.url)
                                 } else {
@@ -97,19 +99,8 @@ fun NewsArticleItem(
                                 Modifier
                                     .align(Alignment.TopEnd)
                                     .padding(8.dp),
-                        ) {
-                            Icon(
-                                imageVector = if (article.saved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                                contentDescription = if (article.saved) "Remove from saved" else "Save article",
-                                tint =
-                                    if (article.saved) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-                                    },
-                                modifier = Modifier.size(24.dp),
-                            )
-                        }
+                            tintWhenNotSaved = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
+                        )
                     }
                 }
 
@@ -154,8 +145,9 @@ fun NewsArticleItem(
 
             // Save button in top-right corner (when no image or overlaying image)
             if (article.urlToImage == null) {
-                IconButton(
-                    onClick = {
+                BookmarkButton(
+                    isSaved = article.saved,
+                    onBookmarkClick = {
                         if (article.saved) {
                             unsaveNewsArticle(article.url)
                         } else {
@@ -166,20 +158,34 @@ fun NewsArticleItem(
                         Modifier
                             .align(Alignment.TopEnd)
                             .padding(8.dp),
-                ) {
-                    Icon(
-                        imageVector = if (article.saved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                        contentDescription = if (article.saved) "Remove from saved" else "Save article",
-                        tint =
-                            if (article.saved) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurface
-                            },
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
+                    tintWhenNotSaved = MaterialTheme.colorScheme.onSurface,
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun BookmarkButton(
+    isSaved: Boolean,
+    onBookmarkClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    tintWhenNotSaved: Color = MaterialTheme.colorScheme.onSurface,
+) {
+    IconButton(
+        onClick = onBookmarkClick,
+        modifier = modifier,
+    ) {
+        Icon(
+            imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+            contentDescription = if (isSaved) "Remove from saved" else "Save article",
+            tint =
+                if (isSaved) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    tintWhenNotSaved
+                },
+            modifier = Modifier.size(24.dp),
+        )
     }
 }

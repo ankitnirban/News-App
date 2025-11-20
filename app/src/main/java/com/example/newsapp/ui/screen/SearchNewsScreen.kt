@@ -23,6 +23,9 @@ import com.example.newsapp.ui.component.NewsArticleItem
 import com.example.newsapp.ui.component.SearchBar
 import kotlinx.coroutines.delay
 
+private const val MIN_SEARCH_QUERY_LENGTH = 3
+private const val SEARCH_DEBOUNCE_DELAY_MS = 300L
+
 @Composable
 fun SearchNewsScreen(
     newsViewModel: NewsViewModel = hiltViewModel(),
@@ -33,8 +36,8 @@ fun SearchNewsScreen(
     val searchResults = newsViewModel.searchResults.collectAsStateWithLifecycle()
 
     LaunchedEffect(searchQuery) {
-        if (searchQuery.length >= 3) {
-            delay(300)
+        if (searchQuery.length >= MIN_SEARCH_QUERY_LENGTH) {
+            delay(SEARCH_DEBOUNCE_DELAY_MS)
             newsViewModel.searchNews(searchQuery)
         }
     }
