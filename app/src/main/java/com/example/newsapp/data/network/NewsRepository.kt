@@ -6,6 +6,8 @@ import com.example.newsapp.data.local.model.NewsArticleEntity
 import com.example.newsapp.data.local.model.NewsSourceEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.Instant
+import java.util.Date
 import javax.inject.Inject
 import kotlin.collections.map
 
@@ -17,7 +19,7 @@ class NewsRepository
     ) {
 
         suspend fun saveNewsArticle(url: String) {
-            newsArticleDao.saveNewsArticle(url)
+            newsArticleDao.saveNewsArticle(url, Date.from(Instant.now()))
         }
 
         suspend fun unsaveNewsArticle(url: String) {
@@ -90,6 +92,8 @@ class NewsRepository
                 if (newsArticlesFromNetwork.isNotEmpty()) {
                     val savedArticleUrls = newsArticleDao.getSavedArticleUrlsOnce()
                     val newsArticleEntities = newsArticlesFromNetwork.map { articleDto ->
+                        val isArticleSaved = savedArticleUrls.contains(articleDto.url)
+                        val savedAt = if (!isArticleSaved) null else newsArticleDao.getArticleByUrl(articleDto.url)!!.savedAt
                         NewsArticleEntity(
                             title = articleDto.title,
                             description = articleDto.description,
@@ -102,7 +106,8 @@ class NewsRepository
                                     name = it.name
                                 )
                             },
-                            saved = savedArticleUrls.contains(articleDto.url)
+                            saved = isArticleSaved,
+                            savedAt = savedAt
                         )
                     }
                     newsArticleDao.clearUnsavedArticles()
