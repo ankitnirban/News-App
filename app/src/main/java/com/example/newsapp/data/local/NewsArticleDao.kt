@@ -18,7 +18,7 @@ interface NewsArticleDao {
     @Query("UPDATE news_articles SET saved = 0 WHERE url = :url")
     suspend fun unsaveNewsArticle(url: String)
 
-    @Query("SELECT * FROM news_articles ORDER BY url DESC")
+    @Query("SELECT * FROM news_articles")
     fun getAllArticles(): Flow<List<NewsArticleEntity>>
 
     @Query("SELECT * FROM news_articles WHERE saved = 1")
