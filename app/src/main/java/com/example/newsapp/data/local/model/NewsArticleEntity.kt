@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "news_articles")
 data class NewsArticleEntity(
-    @PrimaryKey val title: String,
+    val title: String,
     val description: String?,
-    val url: String?,
+    @PrimaryKey val url: String,
     val urlToImage: String?,
     val content: String?,
     @Embedded val source: NewsSourceEntity?,

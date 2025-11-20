@@ -51,12 +51,12 @@ class NewsViewModel
             }
         }
 
-        fun saveNewsArticle(title: String) {
-            viewModelScope.launch { newsRepository.saveNewsArticle(title) }
+        fun saveNewsArticle(url: String) {
+            viewModelScope.launch { newsRepository.saveNewsArticle(url) }
         }
 
-        fun unsaveNewsArticle(title: String) {
-            viewModelScope.launch { newsRepository.unsaveNewsArticle(title) }
+        fun unsaveNewsArticle(url: String) {
+            viewModelScope.launch { newsRepository.unsaveNewsArticle(url) }
         }
 
         fun searchNews(query: String) {

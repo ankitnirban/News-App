@@ -56,8 +56,8 @@ fun SearchNewsScreen(
             items(searchResults.value.size) { index ->
                 NewsArticleItem(
                     article = searchResults.value[index],
-                    saveNewsArticle = { title -> newsViewModel.saveNewsArticle(title) },
-                    unsaveNewsArticle = { title -> newsViewModel.unsaveNewsArticle(title) },
+                    saveNewsArticle = { url -> newsViewModel.saveNewsArticle(url) },
+                    unsaveNewsArticle = { url -> newsViewModel.unsaveNewsArticle(url) },
                     navigateToNewsDetailsScreen = navigateToNewsDetailsScreen,
                 )
             }

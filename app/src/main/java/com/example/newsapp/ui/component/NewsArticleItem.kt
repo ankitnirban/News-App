@@ -43,10 +43,8 @@ fun NewsArticleItem(
             modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clickable(enabled = article.url != null) {
-                    article.url?.let { webUrl ->
-                        navigateToNewsDetailsScreen(webUrl)
-                    }
+                .clickable {
+                    navigateToNewsDetailsScreen(article.url)
                 },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -90,9 +88,9 @@ fun NewsArticleItem(
                         IconButton(
                             onClick = {
                                 if (article.saved) {
-                                    unsaveNewsArticle(article.title)
+                                    unsaveNewsArticle(article.url)
                                 } else {
-                                    saveNewsArticle(article.title)
+                                    saveNewsArticle(article.url)
                                 }
                             },
                             modifier =
@@ -159,9 +157,9 @@ fun NewsArticleItem(
                 IconButton(
                     onClick = {
                         if (article.saved) {
-                            unsaveNewsArticle(article.title)
+                            unsaveNewsArticle(article.url)
                         } else {
-                            saveNewsArticle(article.title)
+                            saveNewsArticle(article.url)
                         }
                     },
                     modifier =

@@ -22,7 +22,7 @@ fun SavedNewsScreen(
             NewsArticleItem(
                 article = article,
                 navigateToNewsDetailsScreen = navigateToNewsDetailsScreen,
-                unsaveNewsArticle = { title -> newsViewModel.unsaveNewsArticle(title) },
+                unsaveNewsArticle = { url -> newsViewModel.unsaveNewsArticle(url) },
             )
         }
     }

@@ -30,8 +30,8 @@ fun BreakingNewsScreen(
             NewsArticleItem(
                 article = article,
                 navigateToNewsDetailsScreen = navigateToNewsDetailsScreen,
-                saveNewsArticle = { title -> newsViewModel.saveNewsArticle(title) },
-                unsaveNewsArticle = { title -> newsViewModel.unsaveNewsArticle(title) },
+                saveNewsArticle = { url -> newsViewModel.saveNewsArticle(url) },
+                unsaveNewsArticle = { url -> newsViewModel.unsaveNewsArticle(url) },
             )
         }
     }
