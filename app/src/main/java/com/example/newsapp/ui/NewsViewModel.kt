@@ -1,5 +1,7 @@
 package com.example.newsapp.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapp.data.network.NewsArticle
@@ -55,6 +57,7 @@ class NewsViewModel
             }
         }
 
+        @RequiresApi(Build.VERSION_CODES.O)
         fun saveNewsArticle(url: String) {
             viewModelScope.launch { newsRepository.saveNewsArticle(url) }
         }
